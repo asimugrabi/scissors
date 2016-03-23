@@ -60,7 +60,11 @@ Download
 --------
 
 ```groovy
-compile 'com.lyft:scissors:1.0.3'
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+compile 'com.github.asimugrabi:scissors:1.0.3.6'
 ```
 
 Snapshots of development version are available in [Sonatype's `snapshots` repository][snap].
