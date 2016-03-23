@@ -5,6 +5,11 @@ Scissors
 
 Fixed viewport image cropping library for Android with built-in support for [Picasso][picasso], [Glide][glide] or [Universal Image Loader][uil].
 
+
+FORK UPDATE
+-----------
+Added circular overlay
+
 Usage
 -----
 

@@ -15,22 +15,25 @@
  */
 package com.lyft.android.scissorssample;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageView;
+
+import java.io.File;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
-import java.io.File;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CropResultActivity extends Activity {
 
     private static final String EXTRA_FILE_PATH = "EXTRA_FILE_PATH";
 
     @Bind(R.id.result_image)
-    ImageView resultView;
+    CircleImageView resultView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

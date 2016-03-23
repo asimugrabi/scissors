@@ -11,5 +11,10 @@
         <attr name="cropviewMaxScale" format="float" />
         <!-- Minimum  zoom level -->
         <attr name="cropviewMinScale" format="float" />
+        <!-- Overlay type-->
+        <attr name="overlayType" format="enum">
+            <enum name="rectangle" value="0" />
+            <enum name="circle" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

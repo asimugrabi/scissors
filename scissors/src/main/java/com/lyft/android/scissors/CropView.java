@@ -15,14 +15,20 @@
  */
 package com.lyft.android.scissors;
 
+import com.lyft.android.scissors.CropViewExtensions.CropRequest;
+import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -32,8 +38,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
-import com.lyft.android.scissors.CropViewExtensions.CropRequest;
-import com.lyft.android.scissors.CropViewExtensions.LoadRequest;
+
 import java.io.File;
 import java.io.OutputStream;
 
@@ -45,12 +50,16 @@ public class CropView extends ImageView {
     private static final int MAX_TOUCH_POINTS = 2;
     private TouchManager touchManager;
 
+    private int overlayType = CropViewConfig.DEFAULT_OVERLAY_TYPE;
+
     private Paint viewportPaint = new Paint();
     private Paint bitmapPaint = new Paint();
 
     private Bitmap bitmap;
     private Matrix transform = new Matrix();
     private Extensions extensions;
+
+    private Bitmap negativeCircleOverlayBitmap;
 
     public CropView(Context context) {
         super(context);
@@ -65,6 +74,8 @@ public class CropView extends ImageView {
 
     void initCropView(Context context, AttributeSet attrs) {
         CropViewConfig config = CropViewConfig.from(context, attrs);
+
+        overlayType = config.getOverlayType();
 
         touchManager = new TouchManager(MAX_TOUCH_POINTS, config);
 
@@ -81,7 +92,13 @@ public class CropView extends ImageView {
         }
 
         drawBitmap(canvas);
-        drawOverlay(canvas);
+        if (overlayType == CropViewConfig.OVERLAY_TYPE_RECTANGLE) {
+            drawOverlay(canvas);
+        } else if (overlayType == CropViewConfig.OVERLAY_TYPE_CIRCLE) {
+            drawNegativeCircle(canvas);
+        } else {
+            throw new IllegalStateException("unknown overlay type");
+        }
     }
 
     private void drawBitmap(Canvas canvas) {
@@ -101,6 +118,21 @@ public class CropView extends ImageView {
         canvas.drawRect(0, 0, getWidth(), top, viewportPaint);
         canvas.drawRect(getWidth() - left, top, getWidth(), getHeight() - top, viewportPaint);
         canvas.drawRect(0, getHeight() - top, getWidth(), getHeight(), viewportPaint);
+    }
+
+    private void drawNegativeCircle(Canvas canvas) {
+        if (negativeCircleOverlayBitmap == null) {
+            negativeCircleOverlayBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+            Canvas tmpCanvas = new Canvas(negativeCircleOverlayBitmap);
+            tmpCanvas.drawRect(0, 0, getWidth(), getHeight(), viewportPaint);
+
+            int viewportWidth = touchManager.getViewportWidth();
+            Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setXfermode(paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)));
+            paint.setColor(Color.TRANSPARENT);
+            tmpCanvas.drawCircle(getWidth() / 2, getHeight() / 2, viewportWidth / 2, paint);
+        }
+        canvas.drawBitmap(negativeCircleOverlayBitmap, 0, 0, bitmapPaint);
     }
 
     @Override
@@ -205,7 +237,8 @@ public class CropView extends ImageView {
     /**
      * Performs synchronous image cropping based on configuration.
      *
-     * @return A {@link Bitmap} cropped based on viewport and user panning and zooming or <code>null</code> if no {@link Bitmap} has been
+     * @return A {@link Bitmap} cropped based on viewport and user panning and zooming or
+     * <code>null</code> if no {@link Bitmap} has been
      * provided.
      */
     @Nullable
@@ -276,7 +309,8 @@ public class CropView extends ImageView {
         }
 
         /**
-         * Load a {@link Bitmap} using an automatically resolved {@link BitmapLoader} which will attempt to scale image to fill view.
+         * Load a {@link Bitmap} using an automatically resolved {@link BitmapLoader} which will
+         * attempt to scale image to fill view.
          *
          * @param model Model used by {@link BitmapLoader} to load desired {@link Bitmap}
          * @see PicassoBitmapLoader
@@ -288,7 +322,8 @@ public class CropView extends ImageView {
         }
 
         /**
-         * Load a {@link Bitmap} using given {@link BitmapLoader}, you must call {@link LoadRequest#load(Object)} afterwards.
+         * Load a {@link Bitmap} using given {@link BitmapLoader}, you must call {@link
+         * LoadRequest#load(Object)} afterwards.
          *
          * @param bitmapLoader {@link BitmapLoader} used to load desired {@link Bitmap}
          * @see PicassoBitmapLoader
@@ -301,7 +336,8 @@ public class CropView extends ImageView {
         /**
          * Perform an asynchronous crop request.
          *
-         * @return {@link CropRequest} used to chain a configure cropping request, you must call either one of:
+         * @return {@link CropRequest} used to chain a configure cropping request, you must call
+         * either one of:
          * <ul>
          * <li>{@link CropRequest#into(File)}</li>
          * <li>{@link CropRequest#into(OutputStream, boolean)}</li>

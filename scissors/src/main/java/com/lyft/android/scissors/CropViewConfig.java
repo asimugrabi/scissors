@@ -21,18 +21,23 @@ import android.util.AttributeSet;
 
 class CropViewConfig {
 
+    public static final int OVERLAY_TYPE_RECTANGLE = 0;
+    public static final int OVERLAY_TYPE_CIRCLE = 1;
+
     public static final float DEFAULT_VIEWPORT_RATIO = 0f;
     public static final float DEFAULT_MAXIMUM_SCALE = 10f;
     public static final float DEFAULT_MINIMUM_SCALE = 0f;
     public static final int DEFAULT_IMAGE_QUALITY = 100;
     public static final int DEFAULT_VIEWPORT_OVERLAY_PADDING = 0;
     public static final int DEFAULT_VIEWPORT_OVERLAY_COLOR = 0xC8000000; // Black with 200 alpha
+    public static final int DEFAULT_OVERLAY_TYPE = OVERLAY_TYPE_RECTANGLE;
 
     private float viewportRatio = DEFAULT_VIEWPORT_RATIO;
     private float maxScale = DEFAULT_MAXIMUM_SCALE;
     private float minScale = DEFAULT_MINIMUM_SCALE;
     private int viewportOverlayPadding = DEFAULT_VIEWPORT_OVERLAY_PADDING;
     private int viewportOverlayColor = DEFAULT_VIEWPORT_OVERLAY_COLOR;
+    private int overlayType = DEFAULT_OVERLAY_TYPE;
 
     public int getViewportOverlayColor() {
         return viewportOverlayColor;
@@ -74,6 +79,14 @@ class CropViewConfig {
         this.minScale = minScale <= 0 ? DEFAULT_MINIMUM_SCALE : minScale;
     }
 
+    public int getOverlayType() {
+        return overlayType;
+    }
+
+    void setOverlayType(int overlayType) {
+        this.overlayType = overlayType;
+    }
+
     public static CropViewConfig from(Context context, AttributeSet attrs) {
         final CropViewConfig cropViewConfig = new CropViewConfig();
 
@@ -98,12 +111,16 @@ class CropViewConfig {
                         CropViewConfig.DEFAULT_MINIMUM_SCALE));
 
         cropViewConfig.setViewportOverlayColor(
-            attributes.getColor(R.styleable.CropView_cropviewViewportOverlayColor,
-                CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_COLOR));
+                attributes.getColor(R.styleable.CropView_cropviewViewportOverlayColor,
+                        CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_COLOR));
 
         cropViewConfig.setViewportOverlayPadding(
-            attributes.getDimensionPixelSize(R.styleable.CropView_cropviewViewportOverlayPadding,
-                CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_PADDING));
+                attributes.getDimensionPixelSize(R.styleable.CropView_cropviewViewportOverlayPadding,
+                        CropViewConfig.DEFAULT_VIEWPORT_OVERLAY_PADDING));
+
+        cropViewConfig.setOverlayType(
+                attributes.getInt(R.styleable.CropView_overlayType,
+                        CropViewConfig.DEFAULT_OVERLAY_TYPE));
 
         attributes.recycle();
 
