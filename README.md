@@ -64,7 +64,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-compile 'com.github.asimugrabi:scissors:1.0.3.6'
+compile 'com.github.asimugrabi:scissors:1.0.3.7'
 ```
 
 Snapshots of development version are available in [Sonatype's `snapshots` repository][snap].

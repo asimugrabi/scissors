@@ -127,10 +127,14 @@ public class CropView extends ImageView {
             tmpCanvas.drawRect(0, 0, getWidth(), getHeight(), viewportPaint);
 
             int viewportWidth = touchManager.getViewportWidth();
+            int viewportHeight = touchManager.getViewportHeight();
+            int diameter = viewportHeight < viewportWidth ? viewportHeight : viewportWidth;
+
             Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint.setXfermode(paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR)));
             paint.setColor(Color.TRANSPARENT);
-            tmpCanvas.drawCircle(getWidth() / 2, getHeight() / 2, viewportWidth / 2, paint);
+
+            tmpCanvas.drawCircle(getWidth() / 2, getHeight() / 2, diameter / 2, paint);
         }
         canvas.drawBitmap(negativeCircleOverlayBitmap, 0, 0, bitmapPaint);
     }
